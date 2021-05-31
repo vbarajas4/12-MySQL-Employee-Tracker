@@ -16,7 +16,8 @@ CREATE TABLE role (
     title VARCHAR(30),
     salary DECIMAL(10,2),
     department_id INT(10),
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    FOREIGN KEY (department_id) REFERENCES department(id)
 );
 
 CREATE TABLE employee (
@@ -25,7 +26,9 @@ CREATE TABLE employee (
     last_name VARCHAR(30) NOT NULL,
     role_id INT(10),
     manager_id INT(10) NULL,
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    FOREIGN KEY (role_id) REFERENCES role(id),
+    FOREIGN KEY (manager_id) REFERENCES employee(id)
 );
 
 INSERT INTO department (name)
@@ -38,9 +41,9 @@ INSERT INTO department (name)
 VALUES ("Development");
 
 INSERT INTO role (title, salary, department_id)
-VALUES ("HR Manager", 95,000, 1);
+VALUES ("HR Manager", 95000, 1);
 INSERT INTO role (title, salary, department_id)
-VALUES ("Customer Representative", 30000, 4);
+VALUES ("Customer Representative", 30000, 1);
 INSERT INTO role (title, salary, department_id)
 VALUES ("Public Relations Manager", 130000, 2);
 INSERT INTO role (title, salary, department_id)
@@ -55,18 +58,18 @@ INSERT INTO role (title, salary, department_id)
 VALUES ("Developer", 75000, 4);
 
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
-VALUES ("Olivia", "Sierra", 1);
+VALUES ("Olivia", "Sierra", 1, null);
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
 VALUES ("Alicia", "Vasquez", 2, 1);
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
-VALUES ("Rose","Love", 3);
+VALUES ("Rose","Love", 3, null);
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
 VALUES ("Jake","Simpson", 4, 3);
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
-VALUES ("Penelope","Johnson", 5);
+VALUES ("Penelope","Johnson", 5, null);
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
 VALUES ("Michael", "Braxton", 6, 5);
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
-VALUES ("Carl", "Mountain", 7);
+VALUES ("Carl", "Mountain", 7, null);
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
 VALUES ("Sophia", "Boots", 8, 7);
