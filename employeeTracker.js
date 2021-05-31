@@ -119,10 +119,8 @@ function addRole() {
         connection.query('INSERT INTO role SET ?', {title: response.title, salary: response.salary, department_id: response.department_id}, (err, data) => {
             if(err) throw err 
             console.table(data)
-        } )
-
             
-       
+        } )    
         runPrompt();
     })
 
