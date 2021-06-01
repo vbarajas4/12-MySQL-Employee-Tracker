@@ -99,6 +99,11 @@ function viewDepartments() {
 }
 
 function addRole() {
+
+  connection.query('SELECT * FROM department', (err, departments) => {
+    if(err) throw err
+    var departmentNames = departments.map(({name}) => name)
+
     inquirer.prompt([
         {
             type: "input",
@@ -108,22 +113,76 @@ function addRole() {
         {
             type: "number",
             name: "salary",
-            message: "enter role salary:"
+            message: "enter role's annual salary:"
         }, 
         {
-            type: "number",
-            name: "department_id",
-            message: "enter department ID:"
+            type: "list",
+            name: "departmentName",
+            message: "What department does this role belong to?",
+            choices: departmentNames
         }])
-    .then(response => {
-        connection.query('INSERT INTO role SET ?', {title: response.title, salary: response.salary, department_id: response.department_id}, (err, data) => {
+        .then(response => {
+          const departmentName = response.departmentName
+          const department_id = departments.find(department => department.name === departmentName).id 
+          connection.query('INSERT INTO role SET ?', {title: response.title, salary: response.salary, department_id}, (err, data) => {
             if(err) throw err 
             console.table(data)
-            
-        } )    
-        runPrompt();
+            runPrompt();
+        })    
+    
     })
 
+})
+}
+
+function viewRoles() {
+  connection.query("SELECT * FROM role", (err, data) => {
+    if(err) throw err
+    console.table(data);
+    runPrompt();
+  })
+}
+
+function addEmployee() {
+
+  connection.query('SELECT * FROM role', (err, roles) => {
+    if(err) throw err
+    var roleNames = roles.map(({title}) => title)
+
+  inquirer.prompt([
+    {
+      type: "input",
+      name: "first_name",    
+      message: "What is the employee's first name?"
+    },
+    {
+      type: "input",
+      name: "last_name",    
+      message: "What is the employee's last name?"
+    },
+    {
+      type: "list",
+      name: "roleName",
+      message: "What is the employee's role?",
+      choices: roleNames
+    },
+    {
+      type: "list",
+      name: "managerName",
+      message: "Who is the employee's manager?",
+      choices: ["Olivia Sierra","Rose Love","Penelope Johnson","Carl Mountain"]  //need to fix into a .map function
+    }
+]).then(response => {
+
+  const roleName = response.roleName
+  const role_id = roles.find(role => role.title === roleName).id
+  connection.query('INSERT INTO employee SET ?', { first_name: response.first_name, last_name: response.last_name, role_id, manager_id: response.manager_id }, (err, data) => {
+      if (err) throw err
+      console.table(data);
+      runPrompt();
+  })
+})
+})
 }
 
 function viewEmployees() {
@@ -131,6 +190,37 @@ function viewEmployees() {
         if(err) throw err
         console.table(data);
         runPrompt();
-    })
+  })
 }
 
+function updateEmployeeRole() {
+  
+  connection.query('SELECT * FROM role', (err, roles) => {
+    if(err) throw err
+    var roleNames = roles.map(({title}) => title)
+
+
+    inquirer.prompt([
+        {
+            type: "list",
+            name: "name",
+            message: "which employee would you like to update?",
+            choices: employeeNames
+        }, 
+        {
+            type: "list",
+            name: "roleName",
+            message: "Select new role for employee?",
+            choices: roleNames
+        }
+    ]).then(response => {
+        const roleName = response.roleName
+        const role_id = roles.find(role => role.title === roleName).id
+        connection.query("UPDATE employee SET role_id = ? WHERE first_name = ?", { role_id, first_name: response.name}, (err, data) =>
+            console.table(data);
+        })
+        runPrompt();
+    })
+
+})
+}
