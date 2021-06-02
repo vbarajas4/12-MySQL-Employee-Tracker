@@ -216,11 +216,10 @@ function updateEmployeeRole() {
     ]).then(response => {
         const roleName = response.roleName
         const role_id = roles.find(role => role.title === roleName).id
-        connection.query("UPDATE employee SET role_id = ? WHERE first_name = ?", { role_id, first_name: response.name}, (err, data) =>
-            console.table(data);
+        connection.query("UPDATE employee SET role_id = ? WHERE first_name = ?", { role_id, first_name: response.name}, (err, data) => {
+          console.table(data);
+          runPrompt();
         })
-        runPrompt();
+      })
     })
-
-})
-}
+  }
