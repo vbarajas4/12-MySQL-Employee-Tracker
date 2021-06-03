@@ -149,44 +149,56 @@ function addEmployee() {
     if(err) throw err
     var roleNames = roles.map(({title}) => title)
 
-  inquirer.prompt([
-    {
-      type: "input",
-      name: "first_name",    
-      message: "What is the employee's first name?"
-    },
-    {
-      type: "input",
-      name: "last_name",    
-      message: "What is the employee's last name?"
-    },
-    {
-      type: "list",
-      name: "roleName",
-      message: "What is the employee's role?",
-      choices: roleNames
-    },
-    {
-      type: "list",
-      name: "managerName",
-      message: "Who is the employee's manager?",
-      choices: ["Olivia Sierra","Rose Love","Penelope Johnson","Carl Mountain"]  //need to fix into a .map function
-    }
-]).then(response => {
+  connection.query('SELECT * FROM employee', (err, employees) => {
+    if(err) throw err
+    var employeeNames = employees.map(({first_name, last_name, id}) => ({name:`${first_name} ${last_name}`, value:id}))
 
-  const roleName = response.roleName
-  const role_id = roles.find(role => role.title === roleName).id
-  connection.query('INSERT INTO employee SET ?', { first_name: response.first_name, last_name: response.last_name, role_id, manager_id: response.manager_id }, (err, data) => {
-      if (err) throw err
-      console.table(data);
-      runPrompt();
+    inquirer.prompt([
+      {
+        type: "input",
+        name: "first_name",    
+        message: "What is the employee's first name?"
+      },
+      {
+        type: "input",
+        name: "last_name",    
+        message: "What is the employee's last name?"
+      },
+      {
+        type: "list",
+        name: "roleName",
+        message: "What is the employee's role?",
+        choices: roleNames
+      },
+      {
+        type: "list",
+        name: "manager_id",
+        message: "Who is the employee's manager?",
+        choices: employeeNames 
+      }
+  ]).then(response => {
+  
+    const roleName = response.roleName 
+    const manager_id = response.manager_id
+    const role_id = roles.find(role => role.title === roleName).id
+    connection.query('INSERT INTO employee SET ?', { first_name: response.first_name, last_name: response.last_name, role_id, manager_id}, (err, data) => {
+        if (err) throw err
+        console.table(data);
+        runPrompt();
+    })
   })
-})
+  }) 
 })
 }
 
 function viewEmployees() {
-    connection.query("SELECT * FROM employee", (err, data) => {
+    connection.query(`
+    SELECT employee.id, employee.first_name, employee.last_name, role.title AS role, 
+    CONCAT(manager.first_name, " ", manager.last_name) AS manager
+    FROM employee 
+    LEFT JOIN role ON employee.role_id = role.id
+    LEFT JOIN employee manager ON employee.manager_id = manager.id
+    `, (err, data) => {
         if(err) throw err
         console.table(data);
         runPrompt();
@@ -199,11 +211,14 @@ function updateEmployeeRole() {
     if(err) throw err
     var roleNames = roles.map(({title}) => title)
 
-
-    inquirer.prompt([
+    connection.query('SELECT * FROM employee', (err, employees) => {
+      if(err) throw err
+      var employeeNames = employees.map(({first_name, last_name, id}) => ({name:`${first_name} ${last_name}`, value:id}))
+ 
+      inquirer.prompt([
         {
             type: "list",
-            name: "name",
+            name: "id",
             message: "which employee would you like to update?",
             choices: employeeNames
         }, 
@@ -214,12 +229,15 @@ function updateEmployeeRole() {
             choices: roleNames
         }
     ]).then(response => {
-        const roleName = response.roleName
+        const roleName = response.roleName 
+        const id = response.id
         const role_id = roles.find(role => role.title === roleName).id
-        connection.query("UPDATE employee SET role_id = ? WHERE first_name = ?", { role_id, first_name: response.name}, (err, data) => {
+        connection.query("UPDATE employee SET role_id = ? WHERE id = ?", [role_id, id], (err, data) => {
+          if(err) throw err
           console.table(data);
           runPrompt();
         })
       })
+    })
     })
   }
