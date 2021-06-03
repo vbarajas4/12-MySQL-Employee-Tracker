@@ -86,7 +86,7 @@ function addDepartment() {
             if (err) throw err
             console.table("Successfully Inserted");
             runPrompt();
-        }).catch(err => {console.error(err)})
+        })
     
 })}
 
