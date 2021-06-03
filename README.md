@@ -1,5 +1,6 @@
 # 12-MySQL-Employee-Tracker
 
+[Video Link](https://drive.google.com/file/d/1BX3Uf13RV92HKOxV_6C9pg2l3PObyU3P/view)
 
 ## User Story
 
