@@ -162,7 +162,11 @@ This functional application performs the following prompts that allow users to:
 
 ## Installation
 
-N/A
+- packages need to be installed such as 
+-- Inquirer, 
+-- console.table, 
+-- mysql
+-- node.js
 
 ## Usage
 
@@ -198,7 +202,6 @@ No Test for this application.
 - VS Code App
 - node.js 
 - MySql
-- packages need to be installed such as Inquirer, console.table, and mysql
 
 ## Contributing
 This project is not accepting contributors at this moment.
